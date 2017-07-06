@@ -1,0 +1,57 @@
+# FR lang file for module dolistorextract
+# Copyright (C) 2017 Jean-François Ferry <jfefe@aternatik.fr>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# Générique
+#
+
+# Module label 'ModuleXXXName'
+# (where XXX is value of numeric property 'numero' of module)
+Module500000Name = Dolistorextract
+# Module description 'ModuleXXXDesc'
+# (where XXX is value of numeric property 'numero' of module)
+Module500000Desc = Dolistorextract module description
+
+#
+# Page d'administration
+#
+DolistorextractSetup = Configuration du module mon module
+Settings = Réglages
+DolistorextractSetupPage = Page de réglage du module Dolistorextract
+
+DolistorExtractImapServer = Serveur IMAP
+DolistorExtractImapServerPort = Port de connexion serveur imap
+DolistorExtractImapUser = Utilisateur IMAP
+DolistorExtractImapPassword = Mot de passe IMAP
+DolistorExtractUserForActions = Utilisateur assigné aux évènements crée par le module
+DolistorExtractEmailTemplateFr = Template email pour message en français
+DolistorExtractEmailTemplateEn = Template email pour message en anglais
+
+#
+# Menu
+#
+DolistorextractMenuTitle = Mails Dolistore
+
+#
+# Action agenda
+#
+DolistorextractLabelActionForSale = Achat module %s
+
+#
+# List emails
+#
+DolistoreMailsList = Liste des emails Dolistore
+DolistoreMailShow = Message Dolistore
