@@ -3,8 +3,6 @@
 # Doxygen generated documentation
 /build/doxygen/doxygen_warnings.log
 /doc/code/doxygen
-# Composer managed dependencies
-/vendor
 /dev/bin
 # PHPdocumentor generated files
 /build/phpdoc

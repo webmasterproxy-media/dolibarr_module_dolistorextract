@@ -1,0 +1,120 @@
+[
+    {
+        "name": "ssilence/php-imap-client",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/SSilence/php-imap-client.git",
+            "reference": "fff097234f886161ca3c5b9b434e8da08fc51aeb"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/SSilence/php-imap-client/zipball/fff097234f886161ca3c5b9b434e8da08fc51aeb",
+            "reference": "fff097234f886161ca3c5b9b434e8da08fc51aeb",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6"
+        },
+        "time": "2017-05-30T11:36:24+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "SSilence\\ImapClient\\": "ImapClient"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "SSilence",
+                "email": "tobias.zeising@aditu.de",
+                "homepage": "https://github.com/SSilence",
+                "role": "Founder"
+            },
+            {
+                "name": "xXXIMMATTEWXXx",
+                "email": "mattparksjr@gmail.com",
+                "homepage": "http://matthewp.lexium.xyz/",
+                "role": "Developer"
+            },
+            {
+                "name": "sergey144010",
+                "homepage": "https://github.com/sergey144010",
+                "role": "Developer"
+            },
+            {
+                "name": "natanfelles",
+                "email": "natanfelles@gmail.com",
+                "homepage": "https://natanfelles.github.io",
+                "role": "Developer"
+            },
+            {
+                "name": "developarts",
+                "email": "nexus@developarts.com",
+                "homepage": "http://www.developarts.com",
+                "role": "Developer"
+            },
+            {
+                "name": "dutchakdev",
+                "email": "dutchakdev@gmail.com",
+                "homepage": "http://dutchak.io/",
+                "role": "Developer"
+            },
+            {
+                "name": "HenriqueSalvan",
+                "email": "henriquesalvan@gmail.com",
+                "homepage": "https://github.com/HenriqueSalvan",
+                "role": "Developer"
+            },
+            {
+                "name": "melcak",
+                "email": "jiri@plugo.cz",
+                "homepage": "http://www.plugo.cz",
+                "role": "Developer"
+            },
+            {
+                "name": "fulldecent",
+                "email": "github.com@phor.net",
+                "homepage": "http://phor.net",
+                "role": "Developer"
+            },
+            {
+                "name": "parturi",
+                "homepage": "https://github.com/parturi",
+                "role": "Developer"
+            },
+            {
+                "name": "tomjoad2000",
+                "homepage": "https://github.com/tomjoad2000",
+                "role": "Developer"
+            },
+            {
+                "name": "radub",
+                "homepage": "https://github.com/radub",
+                "role": "Developer"
+            },
+            {
+                "name": "russ-ab",
+                "homepage": "https://github.com/russ-ab",
+                "role": "Developer"
+            },
+            {
+                "name": "wayne5w",
+                "homepage": "https://github.com/wayne5w",
+                "role": "Developer"
+            }
+        ],
+        "description": "Php imap client",
+        "homepage": "https://github.com/SSilence/php-imap-client",
+        "keywords": [
+            "client",
+            "imap",
+            "php"
+        ]
+    }
+]
