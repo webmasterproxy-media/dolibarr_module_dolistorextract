@@ -156,13 +156,15 @@ class dolistoreMailExtract
 				
 			// Cells
 			foreach( $row as $cell) {
-				$attribute = (string) $cell->span->attributes()->class;
-				if (in_array($attribute, self::ARRAY_EXTRACT_TAGS_PRODUCT)) {
-					$extractProducts[$i][${attribute}] = (string) $cell->span;
-					// hack for <strong> tag into product label
-					if ($attribute == 'item_name') {
-						$extractProducts[$i][${attribute}] = (string) $cell->span->strong;
-					}
+				if ($cell->span) {
+					$attribute = (string) $cell->span->attributes()->class;
+					if (in_array($attribute, self::ARRAY_EXTRACT_TAGS_PRODUCT)) {
+						$extractProducts[$i][${attribute}] = (string) $cell->span;
+						// hack for <strong> tag into product label
+						if ($attribute == 'item_name') {
+							$extractProducts[$i][${attribute}] = (string) $cell->span->strong;
+						}
+					}					
 				}
 			}
 			++$i;
