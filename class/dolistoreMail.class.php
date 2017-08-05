@@ -20,7 +20,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 /**
  * 
- * Class to deschibe dolistore Email
+ * Class to describe dolistore Email
  *
  */
 class dolistoreMail

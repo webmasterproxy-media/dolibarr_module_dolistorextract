@@ -109,7 +109,7 @@ class dolistoreMailExtract
 			return array();
 		}
 		$doc = new DOMDocument();
-		$doc->loadHTML($this->htmlBody);
+		@$doc->loadHTML($this->htmlBody);
 		$xml = simplexml_import_dom($doc);
 
 		$extractDatas = array();
@@ -140,7 +140,7 @@ class dolistoreMailExtract
 			return array();
 		}
 		$doc = new DOMDocument();
-		$doc->loadHTML($this->htmlBody);
+		@$doc->loadHTML($this->htmlBody);
 		$xml = simplexml_import_dom($doc);
 
 		$extractProducts = array();
@@ -160,11 +160,9 @@ class dolistoreMailExtract
 					$attribute = (string) $cell->span->attributes()->class;
 					if (in_array($attribute, self::ARRAY_EXTRACT_TAGS_PRODUCT)) {
 						$extractProducts[$i][${attribute}] = (string) $cell->span;
-						// hack for <strong> tag into product label
-						if ($attribute == 'item_name') {
-							$extractProducts[$i][${attribute}] = (string) $cell->span->strong;
-						}
 					}					
+				} else if ($cell->strong->span) { // Case for product title
+					$extractProducts[$i]['item_name'] = (string) $cell->strong->span;
 				}
 			}
 			++$i;
@@ -231,7 +229,7 @@ class dolistoreMailExtract
 			if ($line == "") continue;
 
 			switch ($lang) {
-				case 'fr_FR' OR 'es_ES':
+				case 'fr_FR' || 'es_ES':
 			
 					if (preg_match(dolistoreMailExtract::ARRAY_PATTERN_MAIL_THIRDPARTY_MAP[${lang}], $line, $matches)) {
 						$emailExtract = "";
@@ -250,6 +248,8 @@ class dolistoreMailExtract
 						
 						
 					}
+					
+					break;
 					
 				case "en_US":
 					
@@ -270,6 +270,10 @@ class dolistoreMailExtract
 						}
 						
 					}
+					break;
+				default:
+					print 'pas de regex pour lang='.$lang;
+					break;
 					
 			}
 		}

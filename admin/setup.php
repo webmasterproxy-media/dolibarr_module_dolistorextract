@@ -68,9 +68,6 @@ if ($action == 'update' || $action == 'add')
 	$constname=GETPOST('constname','alpha');
 	$constvalue=(GETPOST('constvalue_'.$constname) ? GETPOST('constvalue_'.$constname) : GETPOST('constvalue'));
 
-	if (($constname=='ADHERENT_CARD_TYPE' || $constname=='ADHERENT_ETIQUETTE_TYPE' || $constname=='ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS') && $constvalue == -1) $constvalue='';
-	
-
 	$consttype=GETPOST('consttype','alpha');
 	$constnote=GETPOST('constnote');
 	$res=dolibarr_set_const($db,$constname,$constvalue,$type[$consttype],0,$constnote,$conf->entity);

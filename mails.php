@@ -42,10 +42,13 @@ if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@inc
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 include_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
+include_once(DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php');
+include_once(DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php');
+include_once(DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php');
 
+include_once 'class/actions_dolistorextract.class.php';
 include_once 'class/dolistoreMail.class.php';
 include_once 'class/dolistoreMailExtract.class.php';
-
 
 require_once "vendor/autoload.php";
 
@@ -77,7 +80,7 @@ if ($user->societe_id > 0 || ! $user->rights->dolistorextract->read)
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
-$extralabels = $extrafields->fetch_name_optionals_label($object->table_element);
+//$extralabels = $extrafields->fetch_name_optionals_label($object->table_element);
 
 // Load object
 //include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php';  // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
@@ -133,6 +136,17 @@ try{
 // Select the folder Inbox
 $imap->selectFolder('INBOX');
 
+/*
+ * Import des données du message
+ */
+if ($action == 'import') {
+	$email = $imap->getMessage((int) $id);
+	
+	$dolistorextractActions = new \ActionsDolistorextract($db);
+	$res = $dolistorextractActions->launchImportProcess($email);
+	
+	
+}
 
 /*
  * Display selected message
@@ -150,8 +164,103 @@ if ($action == 'read') {
 	if ($view == 'html') {
 		print $email->message->html;
 	}
+	$socStatic = new Societe($db);
+	$formMail = new FormMail($db);
 	
-	print '<div class="center"><a class="button" href="'.$_SERVER['PHP_SELF'].'">Fermer</a></div>';
+	
+	$dolistoreMailExtract = new \dolistoreMailExtract($db, $email->message->html);
+	$datas = $dolistoreMailExtract->extractAllDatas();
+	$langEmail = $dolistoreMailExtract->detectLang($email->header->subject);
+	
+	$dolistoreMail = new \dolistoreMail();
+	$dolistorextractActions = new \ActionsDolistorextract($db);
+	
+	$dolistoreMail->setDatas($datas);
+	
+	// Search exactly by name
+	$filterSearch = array();
+	$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, true);
+	if($searchSoc < 0) {
+		print "Erreur recherche client";
+	
+	} else {
+	
+		// Customer found
+		if(count($searchSoc) > 0) {
+			$socid = $searchSoc[0]->id;
+			$socStatic->fetch($socid);
+			
+			print 'Client trouvé : '.$socStatic->getNomUrl(1).'<br />';
+		} else {
+			print '<strong>Client non trouvé!</strong><br />';
+		}
+		
+	}
+	
+	// Category management
+	foreach ($dolistoreMail->items as $product) {
+		$foundCatId = 0;
+		$resultCat = $dolistorextractActions->searchCategoryDolistore($product['item_reference']);
+		if(! $resultCat) {
+			//echo 'Pas de catégorie dolistore trouvée pour la ref='.$product['item_reference'].'<br />';
+			dol_syslog('No category found for ref='.$product['item_reference'], LOG_WARNING);
+			
+			// Search by label
+			$catStatic = new Categorie($db);
+			$resLabel = $catStatic->fetch('', $product['item_name']);
+			if($resLabel > 0) {
+				$foundCatId = $catStatic->id;				
+			}
+		} else {
+			$foundCatId = $resultCat;
+			//echo "Catégorie dolistore trouvée pour ref ".$product['item_reference']." (".$product['item_name'].") : ".$resultCat;
+		}
+		
+		if ($foundCatId) {
+			$catStatic = new Categorie($db);
+			$res = $catStatic->fetch($foundCatId);
+			echo "<br />Catégorie trouvée pour ref ".$product['item_reference']." (".$product['item_name'].") : ".$catStatic->getNomUrl(1);
+		}
+	}
+	
+	print '<br />';
+	print 'Langue du mail : '.$langEmail;
+		
+	// EN template by default
+	$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_EN;
+	if(preg_match('/fr.*/', $langEmail)) {
+		$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_FR;
+	}
+	$usedTemplate = $formMail->getEMailTemplate($db, 'dolistore_extract', $user, '',$idTemplate);
+	$arraySubstitutionDolistore = [
+			'__DOLISTORE_ORDER_NAME__' => $dolistoreMail->order_name,
+			'__DOLISTORE_INVOICE_FIRSTNAME__' => $dolistoreMail->invoice_firstname,
+			'__DOLISTORE_INVOICE_COMPANY__' => $dolistoreMail->invoice_company,
+			'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname
+	];
+		
+	$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
+	$message=make_substitutions($usedTemplate['content'], $arraySubstitutionDolistore);
+	print '<br />Sujet du mail : '.$subject;
+	print '<br />Texte du mail : '.$message;
+	//print '<br />Template : ';
+	//var_dump($usedTemplate);
+			
+	
+	print '<strong>Données extraites</strong><br/>';
+	print '<pre>';
+	//var_dump($datas);
+	
+	var_dump($dolistoreMail);
+	
+	print '<div class="center">';
+	// TODO: check if already imported
+	print '<a class="button" href="'.$_SERVER['PHP_SELF'].'?action=import&id='.$id.'">Import</a>';
+	
+	
+	print '<a class="button" href="'.$_SERVER['PHP_SELF'].'">Fermer</a>';
+	
+	print '</div>';
 
 }
 if (!$id) {
@@ -174,6 +283,7 @@ print '<th>Date</th>';
 print '<th>ID</th>';
 print '<th>Ref</th>';
 print '<th>Lang</th>';
+print '<th>Company</th>';
 print '<th>Mail</th>';
 print '<th>Contact</th>';
 print '<th>Lu/Non Lu</th>';
@@ -182,13 +292,13 @@ print '</tr>';
 
 foreach($emails as $email) {
 	
-	$mailExtract = new dolistoreMailExtract($db, $email->message->html);
+	$mailExtract = new \dolistoreMailExtract($db, $email->message->html);
 	
 	// Seulement les mails en provenance de dolistore
 	if (strpos($email->header->subject, 'DoliStore') > 0) {
 		
 		$langEmail = dolistoreMailExtract::detectLang($email->header->subject);
-		$datasCustomer = dolistoreMailExtract::extractCustomerDatasFromText($email->message->plain, $langEmail);
+		$datasCustomer = $mailExtract->extractOrderDatas();
 		$datasOrder = dolistoreMailExtract::extractOrderDatasFromSubject($email->header->subject, $langEmail);
 		
 		print '<tr>';
@@ -213,6 +323,11 @@ foreach($emails as $email) {
 		print picto_from_langcode($langEmail);
 		print '</td>';
 		
+		// Company
+		print '<td>';
+		print $datasCustomer['invoice_company'];
+		print '</td>';
+		
 		// Email
 		print '<td>';
 		print $datasCustomer['email'];
@@ -220,7 +335,7 @@ foreach($emails as $email) {
 		
 		// Contact name
 		print '<td>';
-		print $datasCustomer['contact_name'];
+		print $datasCustomer['invoice_lastname'].' '.$datasCustomer['invoice_firstname'];
 		print '</td>';
 		
 		// Read / unread
