@@ -288,12 +288,14 @@ class ActionsDolistorextract
 		
 		foreach($emails as $email) {
 		
-			// Seulement les mails en provenance de dolistore
-			if (strpos($email->header->subject, 'DoliStore') > 0) {
+			// Only mails from Dolistore and not seen
+			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->seen) {
 		
 				$res = $this->launchImportProcess($email);
 				if ($res > 0) {
 					++$mailSent;
+					// Mark email as read
+					$imap->setUnseenMessage($email->msgno, true);
 				} 
 			}
 		}
@@ -355,6 +357,9 @@ class ActionsDolistorextract
 				}
 			
 				if($socid > 0) {
+					
+					// Flag to know if we want to send email or not
+					$mailToSend = false;
 						
 					$socStatic->fetch($socid);
 			
@@ -389,6 +394,10 @@ class ActionsDolistorextract
 			
 							// Event creation
 							$result = $dolistorextractActions->createEventFromExtractDatas($product, $dolistoreMail->order_name, $socid);
+							
+							if ($result > 0) {
+								$mailToSend = true;
+							}
 								
 						}
 					} // End products loop
@@ -396,48 +405,50 @@ class ActionsDolistorextract
 					/*
 					 *  Send mail
 					 */
-					require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-					require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-					$formMail = new FormMail($this->db);
-					
-					$from = $conf->global->MAIN_INFO_SOCIETE_NOM .' <'.$conf->global->MAIN_INFO_SOCIETE_MAIL.'>';
-					$sendto = $dolistoreMail->email;
-					$sendtocc = '';
-					$sendtobcc = '';
-					$trackid = '';
-					$deliveryreceipt = 0;
-					$trackid = '';
+					if ($mailToSend) {
+						require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+						require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
+						$formMail = new FormMail($this->db);
 						
-					// EN template by default
-					$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_EN;
-					if(preg_match('/fr.*/', $langEmail)) {
-						$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_FR;
-					}
-					$usedTemplate = $formMail->getEMailTemplate($this->db, 'dolistore_extract', $userStatic, '',$idTemplate);
-					$arraySubstitutionDolistore = [
-							'__DOLISTORE_ORDER_NAME__' => $dolistoreMail->order_name,
-							'__DOLISTORE_INVOICE_FIRSTNAME__' => $dolistoreMail->invoice_firstname,
-							'__DOLISTORE_INVOICE_COMPANY__' => $dolistoreMail->invoice_company,
-							'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname
-					];
-			
-					$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
-					$message=make_substitutions($usedTemplate['content'], $arraySubstitutionDolistore);
-			
-			
-					$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid);
-					if ($mailfile->error)
-					{
-						++$error;
-						dol_syslog('Dolistorextract::mail:' .$mailfile->error, LOG_ERROR);
-			
-					}
-					else
-					{
-						$result=$mailfile->sendfile();
-						if ($result)
+						$from = $conf->global->MAIN_INFO_SOCIETE_NOM .' <'.$conf->global->MAIN_INFO_SOCIETE_MAIL.'>';
+						$sendto = $dolistoreMail->email;
+						$sendtocc = '';
+						$sendtobcc = '';
+						$trackid = '';
+						$deliveryreceipt = 0;
+						$trackid = '';
+							
+						// EN template by default
+						$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_EN;
+						if(preg_match('/fr.*/', $langEmail)) {
+							$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_FR;
+						}
+						$usedTemplate = $formMail->getEMailTemplate($this->db, 'dolistore_extract', $userStatic, '',$idTemplate);
+						$arraySubstitutionDolistore = [
+								'__DOLISTORE_ORDER_NAME__' => $dolistoreMail->order_name,
+								'__DOLISTORE_INVOICE_FIRSTNAME__' => $dolistoreMail->invoice_firstname,
+								'__DOLISTORE_INVOICE_COMPANY__' => $dolistoreMail->invoice_company,
+								'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname
+						];
+				
+						$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
+						$message=make_substitutions($usedTemplate['content'], $arraySubstitutionDolistore);
+				
+	
+						$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid);
+						if ($mailfile->error)
 						{
-							++$mailSent;
+							++$error;
+							dol_syslog('Dolistorextract::mail:' .$mailfile->error, LOG_ERROR);
+				
+						}
+						else
+						{
+							$result=$mailfile->sendfile();
+							if ($result)
+							{
+								++$mailSent;
+							}
 						}
 					}
 				} else {
