@@ -266,7 +266,7 @@ class ActionsDolistorextract
 		$mailbox = $conf->global->DOLISTOREXTRACT_IMAP_SERVER;
 		$username = $conf->global->DOLISTOREXTRACT_IMAP_USER;
 		$password = $conf->global->DOLISTOREXTRACT_IMAP_PWD;
-		//$encryption = Imap::ENCRYPT_SSL;
+		$encryption = Imap::ENCRYPT_SSL;
 		
 		// Open connection
 		try{
@@ -302,7 +302,7 @@ class ActionsDolistorextract
 		
 	}
 	/**
-	 * 
+	 * Launch all import process
 	 * @param unknown $email Object from imap fetch with lib
 	 */
 	public function launchImportProcess($email) {
