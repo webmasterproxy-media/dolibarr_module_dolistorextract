@@ -22,7 +22,7 @@
 */
 //require_once "dolistorextract.class.php";
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-dol_include_once("/dolistorextract/vendor/autoload.php");
+dol_include_once("/dolistorextract/include/ssilence/php-imap-client/autoload.php");
 
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;

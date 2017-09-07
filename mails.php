@@ -50,7 +50,7 @@ include_once 'class/actions_dolistorextract.class.php';
 include_once 'class/dolistoreMail.class.php';
 include_once 'class/dolistoreMailExtract.class.php';
 
-require_once "vendor/autoload.php";
+dol_include_once("/dolistorextract/include/ssilence/php-imap-client/autoload.php");
 
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;

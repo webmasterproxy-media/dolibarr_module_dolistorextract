@@ -37,9 +37,8 @@ if (file_exists("../../main.inc.php")) {
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-//require_once '../lib/mymodule.lib.php';
 require_once DOL_DOCUMENT_ROOT."/core/class/html.formmail.class.php";
-require_once "../vendor/autoload.php";
+dol_include_once("/dolistorextract/include/ssilence/php-imap-client/autoload.php");
 
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;
