@@ -39,6 +39,7 @@ if (file_exists(dirname(__FILE__).'/../../../../htdocs/master.inc.php')) {
 }
 require_once dirname(__FILE__).'/../../class/dolistoreMail.class.php';
 require_once dirname(__FILE__).'/../../class/dolistoreMailExtract.class.php';
+require_once dirname(__FILE__).'/../../class/dolistorextractConfig.class.php';
 
 use PHPUnit\Framework\TestCase;
 
@@ -60,6 +61,8 @@ class DolistoreMailExtractTest extends TestCase
 	protected $savuser;
 	protected $savlangs;
 	protected $savdb;
+	
+	protected $confDolExtract;
 	
 
 	/**
@@ -84,6 +87,8 @@ class DolistoreMailExtractTest extends TestCase
 		$this->savuser=$user;
 		$this->savlangs=$langs;
 		$this->savdb=$db;
+		
+		$this->confDolExtract = new dolistorextractConfig();
 		
 		fwrite(STDOUT, __METHOD__ ." db->type=".$db->type." user->id=".$user->id."\n");
 	}
@@ -120,6 +125,8 @@ class DolistoreMailExtractTest extends TestCase
 	public function testExtractOrderDatas()
 	{
 		//global $conf, $user, $langs, $db;
+		
+	    
 	
 		$conf=$this->savconf;
 		$user=$this->savuser;

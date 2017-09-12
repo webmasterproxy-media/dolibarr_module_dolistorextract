@@ -17,60 +17,10 @@
 
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+require_once 'dolistorextractConfig.class.php';
 
 class dolistoreMailExtract
 {
-
-	/**
-	 * Array to store keys to extract data about email
-	 *
-	 * @var array
-	 */
-	const ARRAY_EXTRACT_TAGS = array(
-			'invoice_company',
-			'invoice_firstname',
-			'invoice_lastname',
-			'invoice_address1',
-			'invoice_address2',
-			'invoice_city',
-			'invoice_postal_code',
-			'invoice_country',
-			'invoice_state',
-			'invoice_phone',
-			'email',
-			'order_name',
-			'currency',
-			'iso_code'
-	);
-
-	/**
-	 * Array to store keys to extract data for product
-	 * @var array
-	 */
-	const ARRAY_EXTRACT_TAGS_PRODUCT = array(
-			'item_reference',
-			'item_name',
-			'item_price',
-			'item_quantity',
-			'item_price_total'
-	);
-
-	/**
-	 * Map for pattern title and related lang
-	 */
-	const ARRAY_TITLE_TRANSLATION_MAP = array(
-			'New order' => 'en_US',
-			'Nouvelle commande' => 'fr_FR',
-			'Nuevo pedido' => 'es_ES',
-			'Nuovo ordine' => 'it_IT',
-			'Neue Bestellung' => 'de_DE'
-	);
-	
-	const ARRAY_PATTERN_MAIL_THIRDPARTY_MAP = array(
-			'en_US' => '/DoliStore par ce client : (.*)/',
-			'fr_FR' => '/DoliStore par ce client : (.*)/',
-			'es_ES' => '/cliente : (.*)/'
-	);
 
 	/**
 	 *
@@ -108,6 +58,7 @@ class dolistoreMailExtract
 		if (empty($this->htmlBody)) {
 			return array();
 		}
+		$confDolExtract = new dolistorextractConfig();
 		$doc = new DOMDocument();
 		@$doc->loadHTML($this->htmlBody);
 		$xml = simplexml_import_dom($doc);
@@ -119,7 +70,7 @@ class dolistoreMailExtract
 		foreach ($datas as $data)
 		{
 			$attribute = (string) $data->attributes()->class;
-			if (in_array($attribute, self::ARRAY_EXTRACT_TAGS)) {
+			if (in_array($attribute, $confDolExtract->arrayExtractTags)) {
 				$extractDatas[$attribute] = (string) $data[0];
 			}
 		}
@@ -139,6 +90,7 @@ class dolistoreMailExtract
 		if (empty($this->htmlBody)) {
 			return array();
 		}
+		$confDolExtract = new dolistorextractConfig();
 		$doc = new DOMDocument();
 		@$doc->loadHTML($this->htmlBody);
 		$xml = simplexml_import_dom($doc);
@@ -158,7 +110,7 @@ class dolistoreMailExtract
 			foreach( $row as $cell) {
 				if ($cell->span) {
 					$attribute = (string) $cell->span->attributes()->class;
-					if (in_array($attribute, self::ARRAY_EXTRACT_TAGS_PRODUCT)) {
+					if (in_array($attribute, $confDolExtract->arrayExtractTagsProduct)) {
 						$extractProducts[$i][${attribute}] = (string) $cell->span;
 					}					
 				} else if ($cell->strong->span) { // Case for product title
@@ -199,8 +151,9 @@ class dolistoreMailExtract
 	public static function detectLang($subject)
 	{
 		$foundLang = '';
+		$confDolExtract = new dolistorextractConfig();
 		
-		foreach (dolistoreMailExtract::ARRAY_TITLE_TRANSLATION_MAP as $key => $lang) {
+		foreach ($confDolExtract->arrayTitleTranslationMap as $key => $lang) {
 			if (preg_match('/'.$key.'/', $subject)) {
 				$foundLang = $lang;
 				break;
@@ -220,6 +173,7 @@ class dolistoreMailExtract
 	{
 		$customerDatas = array();
 		$arrayLines = explode("\n", $textPlain);
+		$confDolExtract = new dolistorextractConfig();
 		
 		
 		// Search in each line if match found for datas
@@ -231,7 +185,7 @@ class dolistoreMailExtract
 			switch ($lang) {
 				case 'fr_FR' || 'es_ES':
 			
-					if (preg_match(dolistoreMailExtract::ARRAY_PATTERN_MAIL_THIRDPARTY_MAP[${lang}], $line, $matches)) {
+				    if (preg_match($confDolExtract->arrayPatternMailThirdpartyMap[${lang}], $line, $matches)) {
 						$emailExtract = "";
 						
 						// string contains "THIRDPARTY CONTACT_NAME (EMAIL)
