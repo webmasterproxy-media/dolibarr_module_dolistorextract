@@ -368,9 +368,13 @@ class ActionsDolistorextract
 					$mailToSend = false;
 						
 					$socStatic->fetch($socid);
+					$listProduct = array();
 			
 					// Loop on each product
 					foreach ($dolistoreMail->items as $product) {
+					    // Save list of products for email message
+					    $listProduct[] = $product['item_name'];
+					    
 						$catStatic = new Categorie($this->db);
 						$foundCatId = 0;
 						// Search existant category *by product reference*
@@ -430,11 +434,13 @@ class ActionsDolistorextract
 							$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_FR;
 						}
 						$usedTemplate = $formMail->getEMailTemplate($this->db, 'dolistore_extract', $userStatic, '',$idTemplate);
+						$listProductString = implode(', ', $listProduct);
 						$arraySubstitutionDolistore = [
 								'__DOLISTORE_ORDER_NAME__' => $dolistoreMail->order_name,
 								'__DOLISTORE_INVOICE_FIRSTNAME__' => $dolistoreMail->invoice_firstname,
 								'__DOLISTORE_INVOICE_COMPANY__' => $dolistoreMail->invoice_company,
-								'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname
+								'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname,
+						        '__DOLISTORE_LIST_PRODUCTS__' => $listProductString
 						];
 				
 						$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);

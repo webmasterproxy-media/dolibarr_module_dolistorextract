@@ -196,9 +196,12 @@ if ($action == 'read') {
 		}
 		
 	}
-	
+	$listProduct = array();
 	// Category management
 	foreach ($dolistoreMail->items as $product) {
+	    // Save list of products for email message
+	    $listProduct[] = $product['item_name'];
+	    
 		$foundCatId = 0;
 		$resultCat = $dolistorextractActions->searchCategoryDolistore($product['item_reference']);
 		if(! $resultCat) {
@@ -232,11 +235,13 @@ if ($action == 'read') {
 		$idTemplate = $conf->global->DOLISTOREXTRACT_EMAIL_TEMPLATE_FR;
 	}
 	$usedTemplate = $formMail->getEMailTemplate($db, 'dolistore_extract', $user, '',$idTemplate);
+	$listProductString = implode(', ', $listProduct);
 	$arraySubstitutionDolistore = [
 			'__DOLISTORE_ORDER_NAME__' => $dolistoreMail->order_name,
 			'__DOLISTORE_INVOICE_FIRSTNAME__' => $dolistoreMail->invoice_firstname,
 			'__DOLISTORE_INVOICE_COMPANY__' => $dolistoreMail->invoice_company,
-			'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname
+			'__DOLISTORE_INVOICE_LASTNAME__' => $dolistoreMail->invoice_lastname,
+	        '__DOLISTORE_LIST_PRODUCTS__' => $listProductString
 	];
 		
 	$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
