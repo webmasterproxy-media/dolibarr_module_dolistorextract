@@ -318,6 +318,12 @@ class ActionsDolistorextract
 		if (!class_exists('Categorie')) {
 			require_once(DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php');
 		}
+		if (!class_exists('dolistoreMailExtract')) {
+		    dol_include_once('/dolistorextract/class/dolistoreMailExtract.class.php');
+		}
+		if (!class_exists('dolistoreMail')) {
+		    dol_include_once('/dolistorextract/class/dolistoreMail.class.php');
+		}
 		
 		$dolistoreMailExtract = new \dolistoreMailExtract($this->db, $email->message->html);
 		$dolistoreMail = new \dolistoreMail();
