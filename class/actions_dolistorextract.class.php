@@ -295,7 +295,7 @@ class ActionsDolistorextract
 				if ($res > 0) {
 					++$mailSent;
 					// Mark email as read
-					$imap->setUnseenMessage($email->msgno, true);
+					$imap->setSeenMessage($email->msgno, true);
 				} 
 			}
 		}
