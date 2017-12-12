@@ -285,6 +285,8 @@ class ActionsDolistorextract
 		$emails = $imap->getMessages();
 		
 		$mailSent = 0;
+		var_dump(count($emails));
+		var_dump($emails);exit;
 		
 		foreach($emails as $email) {
 		
