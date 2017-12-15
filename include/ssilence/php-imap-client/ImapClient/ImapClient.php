@@ -543,7 +543,7 @@ class ImapClient
             $number = $this->countMessages();
         }
         $emails = array();
-        $result = imap_search($this->imap, 'ALL');
+        $result = imap_search($this->imap, 'UNSEEN');
         if ($result)
         {
             $ids = array();

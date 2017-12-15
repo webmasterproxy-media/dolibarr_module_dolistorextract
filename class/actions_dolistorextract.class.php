@@ -285,23 +285,21 @@ class ActionsDolistorextract
 		$emails = $imap->getMessages();
 		
 		$mailSent = 0;
-		var_dump(count($emails));
-		var_dump($emails);exit;
 		
 		foreach($emails as $email) {
 		
 			// Only mails from Dolistore and not seen
-			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->seen) {
+			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->header->seen) {
 		
 				$res = $this->launchImportProcess($email);
+				$imap->setSeenMessage($email->header->msgno, true);
 				if ($res > 0) {
 					++$mailSent;
 					// Mark email as read
-					$imap->setSeenMessage($email->msgno, true);
+					$imap->setSeenMessage($email->header->msgno, true);
 				} 
 			}
 		}
-		
 		return $mailSent;
 		
 	}
@@ -341,7 +339,6 @@ class ActionsDolistorextract
 		$dolistoreMail->setDatas($datas);
 		
 		if (is_array($datas) and count($datas) > 0) {
-			
 			/*
 			 * import client si non existant
 			 - liaison du client à une catégorie (utilisation d'un extrafield pour stocker la référence produit sur la catégorie)
@@ -352,7 +349,7 @@ class ActionsDolistorextract
 			// Search exactly by name
 			$filterSearch = array();
 			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, true);
-			if($searchSoc < 0) {
+			if(empty($datas['invoice_company'])) {
 				print "Erreur recherche client";
 			
 			} else {
@@ -413,7 +410,8 @@ class ActionsDolistorextract
 								
 						}
 					} // End products loop
-						
+					
+					
 					/*
 					 *  Send mail
 					 */
