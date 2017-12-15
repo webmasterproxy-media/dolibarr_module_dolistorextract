@@ -292,7 +292,6 @@ class ActionsDolistorextract
 			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->header->seen) {
 		
 				$res = $this->launchImportProcess($email);
-				$imap->setSeenMessage($email->header->msgno, true);
 				if ($res > 0) {
 					++$mailSent;
 					// Mark email as read
