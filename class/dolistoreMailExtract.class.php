@@ -105,7 +105,6 @@ class dolistoreMailExtract
 		foreach ($datas as $row)
 		{
 			$extractProducts[$i] = array();
-				
 			// Cells
 			foreach( $row as $cell) {
 				if ($cell->span) {
@@ -118,6 +117,13 @@ class dolistoreMailExtract
 				}
 			}
 			++$i;
+		}
+		foreach($extractProducts as $key => &$lineprod) {
+			$ref = $lineprod["item_reference"];
+			// Test if module is our. Else we unset the line
+			if(!preg_match("/^c458/", $ref)) {
+				unset($extractProducts[$key]);
+			}
 		}
 		return $extractProducts;
 	}

@@ -336,7 +336,6 @@ class ActionsDolistorextract
 		$langEmail = $dolistoreMailExtract->detectLang($email->header->subject);
 		$datas = $dolistoreMailExtract->extractAllDatas();
 		$dolistoreMail->setDatas($datas);
-		
 		if (is_array($datas) and count($datas) > 0) {
 			/*
 			 * import client si non existant
@@ -347,10 +346,9 @@ class ActionsDolistorextract
 			$socStatic = new Societe($this->db);
 			// Search exactly by name
 			$filterSearch = array();
-			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, true);
+			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, false);
 			if(empty($datas['invoice_company'])) {
 				print "Erreur recherche client";
-			
 			} else {
 				// Customer found
 				if(count($searchSoc) > 0) {
