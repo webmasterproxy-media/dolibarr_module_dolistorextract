@@ -223,7 +223,6 @@ class ActionsDolistorextract
 		$actionStatic->label = $langs->trans('DolistorextractLabelActionForSale', $productDatas['item_name'] .' ('.$productDatas['item_reference'].')');
 		// Define a tag which allow to detect twice
 		$actionStatic->note = 'ORDER:'.$orderRef.':'.$productDatas['item_reference'];
-	
 		// Check if import already done
 		if(! $this->isAlreadyImported($actionStatic->note)) {
 			$res = $actionStatic->create($userStatic);
@@ -286,6 +285,7 @@ class ActionsDolistorextract
 		
 		$mailSent = 0;
 		
+		
 		foreach($emails as $email) {
 		
 			// Only mails from Dolistore and not seen
@@ -299,6 +299,7 @@ class ActionsDolistorextract
 				} 
 			}
 		}
+		$this->output=trim($langs->trans('EMailSentForNElements',$mailSent));
 		return $mailSent;
 		
 	}
@@ -403,6 +404,8 @@ class ActionsDolistorextract
 							
 							if ($result > 0) {
 								$mailToSend = true;
+							}else if ($result == 0) {
+								++$mailSent;
 							}
 								
 						}

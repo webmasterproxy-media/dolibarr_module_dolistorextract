@@ -144,8 +144,7 @@ if ($action == 'import') {
 	
 	$dolistorextractActions = new \ActionsDolistorextract($db);
 	$res = $dolistorextractActions->launchImportProcess($email);
-	
-	
+	$action = 'read';
 }
 
 /*
