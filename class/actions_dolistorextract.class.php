@@ -218,6 +218,10 @@ class ActionsDolistorextract
 	
 		$actionStatic->authorid = $conf->global->DOLISTOREXTRACT_USER_FOR_ACTIONS;
 		$actionStatic->userownerid = $conf->global->DOLISTOREXTRACT_USER_FOR_ACTIONS;
+		
+		$actionStatic->datec = time();
+		$actionStatic->datem = time();
+		$actionStatic->datep = time();
 	
 		$actionStatic->type_code = 'AC_STRXTRACT';
 		$actionStatic->label = $langs->trans('DolistorextractLabelActionForSale', $productDatas['item_name'] .' ('.$productDatas['item_reference'].')');
