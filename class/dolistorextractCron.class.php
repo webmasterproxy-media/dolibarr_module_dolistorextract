@@ -41,7 +41,7 @@ class dolistorextractCron
 		
 		$dolistorextractActions = new \ActionsDolistorextract($this->db);
 		$res = $dolistorextractActions->launchCronJob();
-		if ($res < 0) {
+		if ($res <= 0) {
 			print 'erreur import dolistore!';
 			print_r($dolistorextractActions->errors);
 		}
