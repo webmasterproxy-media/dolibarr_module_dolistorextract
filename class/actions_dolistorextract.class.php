@@ -117,7 +117,7 @@ class ActionsDolistorextract
 		$socStatic->code_client = $modCodeClient->getNextValue($socStatic,0);
 		$socStatic->name = $dolistoreMail->invoice_company;
 		$socStatic->name_bis = $dolistoreMail->invoice_lastname;
-		$socStatic->fistname = $dolistoreMail->invoice_firstname;
+		$socStatic->firstname = $dolistoreMail->invoice_firstname;
 		$socStatic->address = $dolistoreMail->invoice_address1;
 		$socStatic->zip = $dolistoreMail->invoice_postal_code;
 		$socStatic->town = $dolistoreMail->invoice_city;
@@ -130,6 +130,10 @@ class ActionsDolistorextract
 		$socStatic->client = 2; // Prospect / client
 		$socid = $socStatic->create($user);
 		if($socid > 0) {
+			$socStatic->fetch_optionals();
+			if(empty($socStatic->array_options["options_provenance"])) $socStatic->array_options["options_provenance"] = "INT";
+			if(empty($socStatic->array_options["options_provenancedet"])) $socStatic->array_options["options_provenancedet"] = "STORE";
+			$socStatic->insertExtraFields();
 			$res = $socStatic->create_individual($user);
 			
 		} else {
@@ -399,7 +403,9 @@ class ActionsDolistorextract
 						if($foundCatId) {
 							// Retrieve category information
 							$catStatic->fetch($foundCatId);
-								
+							
+							
+							$exist = $catStatic->containsObject('customer', $socid);
 							// Link thirdparty to category
 							$catStatic->add_type($socStatic,'customer');
 			
@@ -414,7 +420,6 @@ class ActionsDolistorextract
 								
 						}
 					} // End products loop
-					
 					
 					/*
 					 *  Send mail
