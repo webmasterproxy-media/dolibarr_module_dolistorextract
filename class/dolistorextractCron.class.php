@@ -35,7 +35,11 @@ class dolistorextractCron
 	public function runImport()
 	{
 		
-		global $conf, $langs, $user;
+		global $conf, $langs, $user, $db;
+		
+		// Fetch user conf pour les actions etc. à créer
+		$user = new User($db);
+		$user->fetch($conf->global->DOLISTOREXTRACT_USER_FOR_ACTIONS);
 		
 		require_once 'actions_dolistorextract.class.php';
 		
