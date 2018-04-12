@@ -44,9 +44,12 @@ class dolistorextractCron
 		if ($res < 0) {
 			print 'erreur import dolistore!';
 			print_r($dolistorextractActions->errors);
+			$this->output = implode(';',$dolistorextractActions->errors);
+			return -1;
 		}
 		if($res > 0) {
-			
+			$this->output = $res . ' ventes intégrées';
+			return 0;
 		}
 		
 	}
