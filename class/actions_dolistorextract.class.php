@@ -226,6 +226,7 @@ class ActionsDolistorextract
 		$actionStatic->datec = time();
 		$actionStatic->datem = time();
 		$actionStatic->datep = time();
+		$actionStatic->percentage = 100;
 	
 		$actionStatic->type_code = 'AC_STRXTRACT';
 		$actionStatic->label = $langs->trans('DolistorextractLabelActionForSale', $productDatas['item_name'] .' ('.$productDatas['item_reference'].')');
