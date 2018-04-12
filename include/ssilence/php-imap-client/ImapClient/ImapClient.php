@@ -543,7 +543,7 @@ class ImapClient
             $number = $this->countMessages();
         }
         $emails = array();
-        $result = imap_search($this->imap, 'ALL');
+        $result = imap_search($this->imap, 'UNSEEN');
         if ($result)
         {
             $ids = array();
@@ -737,7 +737,7 @@ class ImapClient
             return false;
         return imap_expunge($this->imap);
     }
-
+    
     /**
      * Delete flag message SEEN
      *
@@ -746,8 +746,20 @@ class ImapClient
      */
     public function setUnseenMessage($ids)
     {
-        // We need better docs for this
-        return imap_clearflag_full($this->imap, $ids, "\\Seen");   
+    	// We need better docs for this
+    	return imap_clearflag_full($this->imap, $ids, "\\Seen");
+    }
+    
+    /**
+     * Add flag message SEEN
+     *
+     * @param int $ids or string like 1,2,3,4,5 or string like 1:5
+     * @return bool
+     */
+    public function setSeenMessage($ids)
+    {
+    	// We need better docs for this
+    	return imap_setflag_full($this->imap, $ids, "\\Seen");
     }
 
     /**

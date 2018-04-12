@@ -117,7 +117,7 @@ class ActionsDolistorextract
 		$socStatic->code_client = $modCodeClient->getNextValue($socStatic,0);
 		$socStatic->name = $dolistoreMail->invoice_company;
 		$socStatic->name_bis = $dolistoreMail->invoice_lastname;
-		$socStatic->fistname = $dolistoreMail->invoice_firstname;
+		$socStatic->firstname = $dolistoreMail->invoice_firstname;
 		$socStatic->address = $dolistoreMail->invoice_address1;
 		$socStatic->zip = $dolistoreMail->invoice_postal_code;
 		$socStatic->town = $dolistoreMail->invoice_city;
@@ -130,6 +130,10 @@ class ActionsDolistorextract
 		$socStatic->client = 2; // Prospect / client
 		$socid = $socStatic->create($user);
 		if($socid > 0) {
+			$socStatic->fetch_optionals();
+			if(empty($socStatic->array_options["options_provenance"])) $socStatic->array_options["options_provenance"] = "INT";
+			if(empty($socStatic->array_options["options_provenancedet"])) $socStatic->array_options["options_provenancedet"] = "STORE";
+			$socStatic->insertExtraFields();
 			$res = $socStatic->create_individual($user);
 			
 		} else {
@@ -218,12 +222,15 @@ class ActionsDolistorextract
 	
 		$actionStatic->authorid = $conf->global->DOLISTOREXTRACT_USER_FOR_ACTIONS;
 		$actionStatic->userownerid = $conf->global->DOLISTOREXTRACT_USER_FOR_ACTIONS;
+		
+		$actionStatic->datec = time();
+		$actionStatic->datem = time();
+		$actionStatic->datep = time();
 	
 		$actionStatic->type_code = 'AC_STRXTRACT';
 		$actionStatic->label = $langs->trans('DolistorextractLabelActionForSale', $productDatas['item_name'] .' ('.$productDatas['item_reference'].')');
 		// Define a tag which allow to detect twice
 		$actionStatic->note = 'ORDER:'.$orderRef.':'.$productDatas['item_reference'];
-	
 		// Check if import already done
 		if(! $this->isAlreadyImported($actionStatic->note)) {
 			$res = $actionStatic->create($userStatic);
@@ -286,20 +293,21 @@ class ActionsDolistorextract
 		
 		$mailSent = 0;
 		
+		
 		foreach($emails as $email) {
 		
 			// Only mails from Dolistore and not seen
-			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->seen) {
+			if (strpos($email->header->subject, 'DoliStore') > 0 && !$email->header->seen) {
 		
 				$res = $this->launchImportProcess($email);
 				if ($res > 0) {
 					++$mailSent;
 					// Mark email as read
-					$imap->setUnseenMessage($email->msgno, true);
+					$imap->setSeenMessage($email->header->msgno, true);
 				} 
 			}
 		}
-		
+		$this->output=trim($langs->trans('EMailSentForNElements',$mailSent));
 		return $mailSent;
 		
 	}
@@ -337,9 +345,7 @@ class ActionsDolistorextract
 		$langEmail = $dolistoreMailExtract->detectLang($email->header->subject);
 		$datas = $dolistoreMailExtract->extractAllDatas();
 		$dolistoreMail->setDatas($datas);
-		
 		if (is_array($datas) and count($datas) > 0) {
-			
 			/*
 			 * import client si non existant
 			 - liaison du client à une catégorie (utilisation d'un extrafield pour stocker la référence produit sur la catégorie)
@@ -349,10 +355,9 @@ class ActionsDolistorextract
 			$socStatic = new Societe($this->db);
 			// Search exactly by name
 			$filterSearch = array();
-			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, true);
-			if($searchSoc < 0) {
+			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, false);
+			if(empty($datas['invoice_company'])) {
 				print "Erreur recherche client";
-			
 			} else {
 				// Customer found
 				if(count($searchSoc) > 0) {
@@ -398,7 +403,9 @@ class ActionsDolistorextract
 						if($foundCatId) {
 							// Retrieve category information
 							$catStatic->fetch($foundCatId);
-								
+							
+							
+							$exist = $catStatic->containsObject('customer', $socid);
 							// Link thirdparty to category
 							$catStatic->add_type($socStatic,'customer');
 			
@@ -407,11 +414,13 @@ class ActionsDolistorextract
 							
 							if ($result > 0) {
 								$mailToSend = true;
+							}else if ($result == 0) {
+								++$mailSent;
 							}
 								
 						}
 					} // End products loop
-						
+					
 					/*
 					 *  Send mail
 					 */

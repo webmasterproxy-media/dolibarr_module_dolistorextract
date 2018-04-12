@@ -144,8 +144,7 @@ if ($action == 'import') {
 	
 	$dolistorextractActions = new \ActionsDolistorextract($db);
 	$res = $dolistorextractActions->launchImportProcess($email);
-	
-	
+	$action = 'read';
 }
 
 /*
@@ -179,7 +178,7 @@ if ($action == 'read') {
 	
 	// Search exactly by name
 	$filterSearch = array();
-	$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, true);
+	$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch);
 	if($searchSoc < 0) {
 		print "Erreur recherche client";
 	
