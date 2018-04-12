@@ -430,7 +430,7 @@ class ActionsDolistorextract
 						require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
 						$formMail = new FormMail($this->db);
 						
-						$from = $conf->global->MAIN_INFO_SOCIETE_NOM .' <'.$conf->global->MAIN_INFO_SOCIETE_MAIL.'>';
+						$from = $conf->global->MAIN_INFO_SOCIETE_NOM .' <dolistore@atm-consulting.fr>';
 						$sendto = $dolistoreMail->email;
 						$sendtocc = '';
 						$sendtobcc = '';
