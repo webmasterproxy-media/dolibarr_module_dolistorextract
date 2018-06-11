@@ -126,26 +126,20 @@ class ActionsDolistorextract
 		$socStatic->country_code = $dolistoreMail->invoice_country;
 		$socStatic->state = $dolistoreMail->invoice_state;
 		$socStatic->multicurrency_code = $dolistoreMail->currency;
-	
+
+		// Le champ invoice_country contient bien le pays dans la langue : Espagne => Spain
+		$resql = $this->db->query('SELECT rowid as fk_country FROM '.MAIN_DB_PREFIX."c_country WHERE label = '".$this->db->escape($dolistoreMail->invoice_country)."'");
+		if($resql) {
+			if(($obj = $this->db->fetch_object($resql)) && $this->db->num_rows($resql) == 1) $socStatic->country_id = $obj->fk_country;
+		}
+
+		$socStatic->array_options["options_provenance"] = "INT";
+		$socStatic->array_options["options_provenancedet"] = "STORE";
+
 		$socStatic->client = 2; // Prospect / client
 		$socid = $socStatic->create($user);
 		if($socid > 0) {
-			$socStatic->fetch_optionals();
-			if(empty($socStatic->array_options["options_provenance"])) $socStatic->array_options["options_provenance"] = "INT";
-			if(empty($socStatic->array_options["options_provenancedet"])) $socStatic->array_options["options_provenancedet"] = "STORE";
-			$socStatic->insertExtraFields();
-
-			// Le champ invoice_country contient bien le pays dans la langue : Espagne => Spain
-			$resql = $this->db->query('SELECT rowid as fk_country FROM '.MAIN_DB_PREFIX."c_country WHERE label = '".$this->db->escape($dolistoreMail->invoice_country)."'");
-			if($resql) {
-				if(($obj = $this->db->fetch_object($resql)) && $this->db->num_rows($resql) == 1) {
-					$socStatic->country_id = $obj->fk_country;
-					$socStatic->update(0);
-				}
-			}
-
 			$res = $socStatic->create_individual($user);
-			
 		} else {
 			var_dump($socStatic->errors);
 		}
