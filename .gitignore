@@ -13,3 +13,4 @@
 /.buildpath
 /.project 
 /vendor/**/.git
+nbproject/
