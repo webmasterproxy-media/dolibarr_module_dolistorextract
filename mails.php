@@ -178,22 +178,31 @@ if ($action == 'read') {
 	
 	// Search exactly by name
 	$filterSearch = array();
-	$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch);
+    if(floatval(DOL_VERSION) <= 8.0) {
+        $searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch); // Retourne un tableau ou -1 en cas d'erreur
+    }
+    else {
+        $searchSoc = $socStatic->fetch('', $datas['invoice_company']);  // Retourne -2 si on trouve plusieurs Tiers
+    }
 	if($searchSoc < 0) {
 		print "Erreur recherche client";
 	
 	} else {
-	
-		// Customer found
-		if(count($searchSoc) > 0) {
-			$socid = $searchSoc[0]->id;
-			$socStatic->fetch($socid);
-			
-			print 'Client trouvé : '.$socStatic->getNomUrl(1).'<br />';
-		} else {
-			print '<strong>Client non trouvé!</strong><br />';
-		}
-		
+        if(floatval(DOL_VERSION) <= 8.0) {
+            // Customer found
+            if(count($searchSoc) > 0) {
+                $socid = $searchSoc[0]->id;
+                $socStatic->fetch($socid);
+
+                print 'Client trouvé : '.$socStatic->getNomUrl(1).'<br />';
+            }
+            else {
+                print '<strong>Client non trouvé!</strong><br />';
+            }
+        }
+        else {
+            print 'Client trouvé : '.$socStatic->getNomUrl(1).'<br />';
+        }
 	}
 	$listProduct = array();
 	// Category management
