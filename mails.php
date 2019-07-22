@@ -252,17 +252,13 @@ if ($action == 'read') {
 	        '__DOLISTORE_LIST_PRODUCTS__' => $listProductString
 	];
 		
-	$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
-	$message=make_substitutions($usedTemplate['content'], $arraySubstitutionDolistore);
+	$subject=make_substitutions($usedTemplate->topic, $arraySubstitutionDolistore);
+	$message=make_substitutions($usedTemplate->content, $arraySubstitutionDolistore);
 	print '<br />Sujet du mail : '.$subject;
 	print '<br />Texte du mail : '.$message;
-	//print '<br />Template : ';
-	//var_dump($usedTemplate);
-			
 	
 	print '<strong>Données extraites</strong><br/>';
 	print '<pre>';
-	//var_dump($datas);
 	
 	var_dump($dolistoreMail);
 	
