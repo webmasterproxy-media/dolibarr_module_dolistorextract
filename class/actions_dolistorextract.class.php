@@ -472,8 +472,8 @@ class ActionsDolistorextract
 						        '__DOLISTORE_LIST_PRODUCTS__' => $listProductString
 						];
 				
-						$subject=make_substitutions($usedTemplate['topic'], $arraySubstitutionDolistore);
-						$message=make_substitutions($usedTemplate['content'], $arraySubstitutionDolistore);
+						$subject=make_substitutions($usedTemplate->topic, $arraySubstitutionDolistore);
+						$message=make_substitutions($usedTemplate->content, $arraySubstitutionDolistore);
 				
 	
 						$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), $sendtocc, $sendtobcc, $deliveryreceipt, -1, '', '', $trackid);
