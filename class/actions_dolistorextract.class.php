@@ -360,17 +360,32 @@ class ActionsDolistorextract
 			$socStatic = new Societe($this->db);
 			// Search exactly by name
 			$filterSearch = array();
-			$searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, false);
+            if(floatval(DOL_VERSION) <= 8.0) {
+                $searchSoc = $socStatic->searchByName($datas['invoice_company'], 0, $filterSearch, true, false);
+            }
+            else {
+                $searchSoc = $socStatic->fetch('', $datas['invoice_company']);  // Retourne -2 si on trouve plusieurs Tiers
+            }
 			if(empty($datas['invoice_company'])) {
 				print "Erreur recherche client";
 			} else {
-				// Customer found
-				if(count($searchSoc) > 0) {
-					$socid = $searchSoc[0]->id;
-				} else {
-					// Customer not found => creation
-					$socid = $dolistorextractActions->newCustomerFromDatas($userStatic, $dolistoreMail);
-				}
+                if(floatval(DOL_VERSION) <= 8.0) {
+                    // Customer found
+                    if(count($searchSoc) > 0) {
+                        $socid = $searchSoc[0]->id;
+                    }
+                    else {
+                        // Customer not found => creation
+                        $socid = $dolistorextractActions->newCustomerFromDatas($userStatic, $dolistoreMail);
+                    }
+                }
+                else {
+                    if(! empty($searchSoc)) $socid = $searchSoc;
+                    else {
+                        // Customer not found => creation
+                        $socid = $dolistorextractActions->newCustomerFromDatas($userStatic, $dolistoreMail);
+                    }
+                }
 			
 				if($socid > 0) {
 					
