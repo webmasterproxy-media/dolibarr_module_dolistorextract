@@ -354,7 +354,7 @@ foreach($emails as $email) {
 		
 		// Actions
 		print '<td>';
-		print '<a href="'.$_SERVER['PHP_SELF'].'?action=read&view=plain&id='.$email->header->uid.'">Voir</a>';
+		print '<a href="'.$_SERVER['PHP_SELF'].'?action=read&view=plain&id='.$email->header->msgno.'">Voir</a>';
 		//print '<a href="'.$_SERVER['PHP_SELF'].'?action=read&view=html&id='.$email->header->uid.'">HTML</a>';
 		print '</td>';
 		
